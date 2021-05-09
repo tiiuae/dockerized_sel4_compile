@@ -1,24 +1,59 @@
 FROM ubuntu:20.10
 
+# tzdata noninteractive install
+ENV TZ=Europe/Helsinki
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 RUN \
-   apt-get -y update && \
-   apt-get -y upgrade && \
-   apt-get -y install cmake && \
-   apt-get -y install ninja-build && \
-   apt-get -y install git && \
-   apt-get -y install cpio && \
-   apt-get -y install sudo && \
-   apt-get -y install python3-pip && \
-   apt-get -y install libxml2-utils && \
-   apt-get -y install protobuf-compiler && \
-   apt-get -y install python3-protobuf && \
-   apt-get -y install gcc-aarch64-linux-gnu && \
-   apt-get -y install g++-aarch64-linux-gnu && \
-   apt-get -y install device-tree-compiler
+    apt-get -y update && \
+    apt-get -y upgrade && \
+    apt-get -y install \
+        build-essential \
+        fakeroot \
+        dpkg-dev \
+        cmake \
+        ninja-build \
+        haskell-stack \
+        git \
+        cpio \
+        sudo \
+        libxml2-utils \
+        protobuf-compiler \
+        python3-pip \
+        python3-pyelftools \
+        python3-future \
+        python3-jinja2 \
+        python3-jsonschema \
+        python3-libarchive-c \
+        python3-ply \
+        python3-protobuf \
+        python3-simpleeval \
+        python3-sortedcontainers \
+        gcc-aarch64-linux-gnu \
+        g++-aarch64-linux-gnu \
+        device-tree-compiler
 
-EXPOSE 22
+RUN useradd -d /home/build -m -u 1000 build
 
-COPY start.sh /root
+USER build
 
-ENTRYPOINT "/root/start.sh"
+RUN pip3 install \
+    aenum \
+    orderedset \
+    plyplus \
+    pyfdt \
+    pyyaml
 
+# Let's build all the capdl's dependencies. Downloading, compiling and
+# installing the correct GHC version and all of the dependencies takes
+# lots of time and we don't want to redo that everytime we restart the
+# container.
+
+RUN \
+    git clone https://github.com/seL4/capdl.git /home/build/capdl && \
+    cd /home/build/capdl/capDL-tool && \
+    stack build --only-dependencies && \
+    cd /home/build && \
+    rm -rf /home/build/capdl
+
+WORKDIR /workspace
