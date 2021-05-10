@@ -1,34 +1,50 @@
-# Communication link - ROS2 Node
+# Dockerized seL4 build
 
-## Generate a device key pair
-```
-openssl req -x509 -newkey rsa:2048 -keyout rsa_private.pem -nodes -out rsa_cert.pem -subj "/CN=unused"
-```
-The `rsa_private.pem` will stay on the device side and the public part `rsa_cert.pem` will be uploaded to the MQTT broker.
+## General
 
-## Building
+These instructions have been tested with Ubuntu 20.10 desktop host running in VirtualBox and Ubuntu 20.10 desktop running inside Docker container.
 
-The application can be built as follows
+## Update local Ubuntu repositories on host
 ```
-source ../../install/setup.bash
-go build
+host% sudo apt-get -y update
+host% sudo apt-get -y upgrade
 ```
 
-In addition to communication link, the video streaming node can be built as well from this repo.
-The videonode listens a selected video stream based on the configuration file and streams it to rtsp server in cloud.
-The video feed can be selected from cloud by sending mqtt messages to select a wanted camera configuration. Please see the image videonode/videostream.png. 
-The videonode can be built as follows:
+## Install curl command on host
 ```
-cd videonode
-go build
+host% sudo apt install -y curl
 ```
 
-## Running
-
+## Install repo command on host
 ```
-./communication_link -device_id "<my-device-id>"
-videonode/videonode -device_id "<my-device-id>"
+host% sudo curl https://storage.googleapis.com/git-repo-downloads/repo > /tmp/repo
+host% sudo mv /tmp/repo /usr/local/bin
+host% sudo chmod +x /usr/local/bin/repo
 ```
-*IMPORTANT*<br>
-videonode has been removed and its functionality is now in depthai_ctrl ROS2 node.
 
+## Install git command on host
+```
+host% sudo apt install -y git
+host% git config --global user.email "you@example.com"
+host% git config --global user.name "Your Name"
+```
+
+## Make link into right Python binary
+```
+host% sudo ln -s /usr/bin/python3 /usr/local/bin/python
+```
+
+## Download seL4 repository
+```
+host% mkdir seL4test
+host% cd seL4test
+host% repo init -u https://github.com/tiiuae/sel4test-manifest.git
+host% repo sync
+```
+
+## Install Docker
+```
+host% sudo apt install -y docker docker.io
+host% sudo usermod -aG docker $USER
+host% reboot
+```
