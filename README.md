@@ -48,3 +48,4 @@ host% ./enter_container.sh
 ```
 guest% ./build_rpi4_vm_minimal.sh
 ```
+
