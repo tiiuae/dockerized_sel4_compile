@@ -2,7 +2,7 @@
 
 ## General
 
-These instructions have been tested with Ubuntu 20.10 desktop host running in VirtualBox and Ubuntu 20.10 desktop running inside Docker container.
+These instructions have been tested with Ubuntu 20.10 desktop host running in VirtualBox and Ubuntu 20.10 desktop guest running inside Docker container.
 
 ## Update local Ubuntu repositories on host
 ```
@@ -10,41 +10,41 @@ host% sudo apt-get -y update
 host% sudo apt-get -y upgrade
 ```
 
-## Install curl command on host
+## Install and configure git on host
 ```
-host% sudo apt install -y curl
-```
-
-## Install repo command on host
-```
-host% sudo curl https://storage.googleapis.com/git-repo-downloads/repo > /tmp/repo
-host% sudo mv /tmp/repo /usr/local/bin
-host% sudo chmod +x /usr/local/bin/repo
-```
-
-## Install git command on host
-```
-host% sudo apt install -y git
+host% sudo apt -y install git
 host% git config --global user.email "you@example.com"
 host% git config --global user.name "Your Name"
 ```
 
-## Make link into right Python binary
+## Install and configure docker on host
 ```
-host% sudo ln -s /usr/bin/python3 /usr/local/bin/python
+host% sudo apt -y install docker docker.io
+host% sudo usermod -aG docker $USER
+host% reboot
 ```
 
-## Download seL4 repository
+## Download repository and build docker container
 ```
-host% mkdir seL4test
-host% cd seL4test
+host% cd ~
+host% git clone https://github.com/tiiuae/dockerized_sel4_compile.git
+host% cd dockerized_sel4_compile
+host% docker build -t tiiuae/build .
+```
+
+## Install repo command and initialize repository
+```
+host% sudo apt -y install repo
 host% repo init -u https://github.com/tiiuae/sel4test-manifest.git
 host% repo sync
 ```
 
-## Install Docker
+## Enter docker container
 ```
-host% sudo apt install -y docker docker.io
-host% sudo usermod -aG docker $USER
-host% reboot
+host% ./enter_container.sh
+```
+
+## Build RPI4 image inside guest
+```
+guest% ./build_rpi4_vm_minimal.sh
 ```

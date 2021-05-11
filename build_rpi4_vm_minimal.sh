@@ -13,4 +13,5 @@ cd ${TARGET}
 ninja
 
 echo "Here are your binaries in ${TARGET}/images: "
-ls -l ${TARGET}/images
+ls -l ./images
+

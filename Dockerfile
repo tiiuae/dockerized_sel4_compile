@@ -34,6 +34,7 @@ RUN \
         device-tree-compiler
 
 RUN useradd -d /home/build -m -u 1000 build
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 USER build
 
