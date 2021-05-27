@@ -44,8 +44,10 @@ host% repo sync
 host% ./enter_container.sh
 ```
 
-## Build RPI4 image inside guest
+## Build RPI4 example images inside guest
 ```
 guest% ./build_rpi4_vm_minimal.sh
+guest% ./build_rpi4_vm_multi.sh
+guest% ./build_rpi4_cross_vm_connections.sh
 ```
 
